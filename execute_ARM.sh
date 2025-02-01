@@ -13,11 +13,17 @@ az login
 az group create --name $RESOURCE_GROUP --location $LOCATION
 
 # Deploy ARM Template
-az deployment group create \
+DEPLOYMENT_OUTPUT=$(az deployment group create \
   --name $DEPLOYMENT_NAME \
   --resource-group $RESOURCE_GROUP \
   --template-file $TEMPLATE_FILE \
-  --parameters location1=westus location2=southindia
+  --parameters location1=westus location2=southindia)
 
-# Output deployment details
-echo "Deployment complete!"
+# Check if deployment was successful
+if echo "$DEPLOYMENT_OUTPUT" | grep -q '"provisioningState": "Succeeded"'; then
+  echo "Deployment complete!"
+else
+  echo "Deployment failed!"
+  echo "$DEPLOYMENT_OUTPUT"
+  exit 1
+fi
